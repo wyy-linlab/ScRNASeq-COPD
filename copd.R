@@ -69,75 +69,9 @@ merged_seurat <- merge(x = data_seurat.raw$ctl.o1,
 
 merged_seurat$log10GenesPerUMI <- log10(merged_seurat$nFeature_RNA) / log10(merged_seurat$nCount_RNA)
 
-
-### quality control
-### the number of cell count per sample
-merged_seurat@meta.data %>% 
-  ggplot(aes(x=orig.ident, fill=orig.ident)) + 
-  geom_bar() +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
-  theme(plot.title = element_text(hjust=0.5, face="bold")) +
-  ggtitle("NCells")
-
-### the count per cell
-
-merged_seurat@meta.data %>% 
-  ggplot(aes(color=orig.ident, x=nCount_RNA, fill= orig.ident)) + 
-  geom_density(alpha = 0.2) + 
-  scale_x_log10() + 
-  theme_classic() +
-  ylab("Cell density") +
-  geom_vline(xintercept = 500)
-
-### the distribution of genes detected per cell via histogram
-merged_seurat@meta.data  %>% 
-  ggplot(aes(color=orig.ident, x=nFeature_RNA, fill= orig.ident)) + 
-  geom_density(alpha = 0.2) + 
-  theme_classic() +
-  scale_x_log10() + 
-  geom_vline(xintercept = 300)
-
-merged_seurat@meta.data  %>% 
-  ggplot(aes(x=nCount_RNA, y=nFeature_RNA, color=percent.mt)) + 
-  geom_point() + 
-  scale_colour_gradient(low = "gray90", high = "black") +
-  stat_smooth(method=lm) +
-  scale_x_log10() + 
-  scale_y_log10() + 
-  theme_classic() +
-  geom_vline(xintercept = 500) +
-  geom_hline(yintercept = 250) +
-  facet_wrap(~orig.ident)
-
-merged_seurat@meta.data %>% 
-  ggplot(aes(color=orig.ident, x=percent.mt, fill=orig.ident)) + 
-  geom_density(alpha = 0.2) + 
-  scale_x_log10() + 
-  theme_classic() +
-  geom_vline(xintercept = 0.2)
-
-merged_seurat@meta.data %>%
-  ggplot(aes(x=log10(merged_seurat@meta.data$nFeature_RNA) / log10(merged_seurat@meta.data$nCount_RNA), color = orig.ident, fill=orig.ident)) +
-  geom_density(alpha = 0.2) +
-  theme_classic() +
-  geom_vline(xintercept = 0.8)+xlab("log10(nFeature_RNA)/log10(nCount_RNA)")
-
+### filtering
 data_seurat <- subset(x=merged_seurat,
                           subset = nFeature_RNA > 300 & percent.mt < 0.3)
-
-data_seurat@meta.data  %>% 
-  ggplot(aes(x=nCount_RNA, y=nFeature_RNA, color=percent.mt)) + 
-  geom_point() + 
-  scale_colour_gradient(low = "gray90", high = "black") +
-  stat_smooth(method=lm) +
-  scale_x_log10() + 
-  scale_y_log10() + 
-  theme_classic() +
-  geom_vline(xintercept = 500) +
-  geom_hline(yintercept = 250) +
-  facet_wrap(~orig.ident)
-
 
 ### integrate
 data_seurat.anchors <- FindIntegrationAnchors(data_seurat,dims = 1:30,anchor.features = 3000,verbose = F)
