@@ -329,10 +329,10 @@ mast_table_diagnosis_volcano <- mast_table_diagnosis_volcano[order(mast_table_di
 write.table(mast_table_diagnosis_volcano[mast_table_diagnosis_volcano$cluster %in% cluster_names[1:8],c(1,3,6,5)], file = "../result/MAST/volcano_table_immune.txt",sep="\t",row.names = F,quote = F)
 write.table(mast_table_diagnosis_volcano[mast_table_diagnosis_volcano$cluster %in% cluster_names[9:15],c(1,3,6,5)], file = "../result/MAST/volcano_table_non_immune.txt",sep="\t",row.names = F,quote = F)
 
-## subClustering monocytes (Fig3B-D) ----
+## subClustering monocytes 
 data_integrated_cluster <- SplitObject(data_integrated,split.by = "cell_type")
 subcluster_cluster <- list()
-# 1.monocytes subClustering--
+
 subcluster_cluster$monocytes <- data_integrated_cluster$monocytes
 DefaultAssay(subcluster_cluster$monocytes) <- "integrated"
 subcluster_cluster$monocytes$umap1 <- subcluster_cluster$monocytes@reductions$umap@cell.embeddings[,1]
@@ -345,7 +345,7 @@ subcluster_cluster$monocytes <- subcluster_cluster$monocytes %>%     # t-SNE
   FindNeighbors(reduction = "pca", dims = 1:14,verbose = F) %>% FindClusters(resolution = seq(0.1,0.3,by = 0.1),verbose = F)
 
 DefaultAssay(subcluster_cluster$monocytes) <- "RNA"
-# Fig3C --
+
 function_FeaturePlot(subcluster_cluster$monocytes,reduction = "tsne",features = c("CD14","FCGR3A","CDKN1C","S100A8","S100A9","CSF3R"), ncol = 3)     # CD14,CD16 marker
 ggsave("../result/Fig3/Fig3_monocytes_subcluster_marker.pdf",device = "pdf",width = 5.5,height = 4)
 
@@ -354,7 +354,7 @@ subcluster_cluster$monocytes$subcl[subcluster_cluster$monocytes$subcl %in% c(0,2
 subcluster_cluster$monocytes$subcl[subcluster_cluster$monocytes$subcl == 1]="CD16+mono"
 subcluster_cluster$monocytes$subcl <- factor(subcluster_cluster$monocytes$subcl,levels = c("CD14+mono","CD16+mono"))
 
-# subcluster plot (Fig3C)--
+# subcluster plot 
 DimPlot(subcluster_cluster$monocytes,reduction = "tsne",group.by = "subcl",cols = c("#F8766D","#00B0F6"),label = T)+xlab("t-SNE1")+ylab("t-SNE2")
 ggsave("../result/Fig3/Fig3_monocytes_subcluster.pdf",device = "pdf",width = 4.9,height = 3.5)
 
